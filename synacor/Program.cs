@@ -1,4 +1,6 @@
-﻿namespace synacor
+﻿using System;
+
+namespace synacor
 {
     class Program
     {
