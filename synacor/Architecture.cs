@@ -19,7 +19,7 @@ namespace synacor
             for (var i = 1; i < content.Length; i += 2)
             {
                 var value = content[i - 1] + (content[i] << 8);
-                if (value < 32775)
+                if (value < 32776)
                 {
                     _memory[_size++] = value;
                 }
@@ -34,10 +34,6 @@ namespace synacor
             {
                 pos = ProcessCommand(pos);
                 opCount++;
-                if (opCount % 100000 == 0)
-                {
-                    Console.WriteLine(opCount);
-                }
             }
         }
 
@@ -133,6 +129,7 @@ namespace synacor
                     return GetRealValue(_stack.Pop());
                 case 19:
                     _terminal += (char)GetRealValue(_memory[pos + 1]);
+                    Console.Write((char)GetRealValue(_memory[pos + 1]));
                     return pos + 2;
                 case 20:
                     Console.WriteLine(_terminal);
