@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace synacor
 {
@@ -10,8 +11,36 @@ namespace synacor
         private readonly int[] _registers = new int[8];
         private readonly Stack<int> _stack = new Stack<int>();
         private int _size;
+        private string _moves = string.Empty;
+        private Dictionary<int, string> _coins = new Dictionary<int, string>
+        {
+            {2, "red"},
+            {3, "corroded"},
+            {5, "shiny"},
+            {7, "concave"},
+            {9, "blue"}
+        };
+
+        public List<string> GetCoinCombination()
+        {
+            return null;
+        }
         
-        public void ReadProgram(string filename)
+        public void Process(string filename, bool useKnownMoves = true)
+        {
+            ReadProgram(filename);
+            if (useKnownMoves)
+            {
+                _moves = File.ReadAllText("moves.txt");
+            }
+
+            int pos = 0;
+            while (pos < _size)
+            {
+                pos = ProcessCommand(pos);
+            }
+        }
+        private void ReadProgram(string filename)
         {
             var content = File.ReadAllBytes(filename);
 
@@ -22,17 +51,6 @@ namespace synacor
                 {
                     _memory[_size++] = value;
                 }
-            }
-        }
-
-        public void Process()
-        {
-            int pos = 0;
-            int opCount = 0;
-            while (pos < _size)
-            {
-                pos = ProcessCommand(pos);
-                opCount++;
             }
         }
 
@@ -136,15 +154,48 @@ namespace synacor
                     Console.Write((char)GetRealValue(_memory[pos + 1]));
                     return pos + 2;
                 case 20:
-                    var key = Console.ReadKey();
-                    _registers[GetRegister(_memory[pos + 1])] = key.KeyChar != 13 ? key.KeyChar : 10;
-                    
+                    if (_moves.Length > 0)
+                    {
+                        if (_moves[0] == 13)
+                        {
+                            _moves = _moves.Substring(1);
+                        }
+                        _registers[GetRegister(_memory[pos + 1])] = _moves[0];
+                        Console.Write(_moves[0]);                         
+                        _moves = _moves.Substring(1);
+                    }
+                    else
+                    {
+                        var key = Console.ReadKey().KeyChar;
+                        _registers[GetRegister(_memory[pos + 1])] = key != 13 ? key : 10;
+                    }
                     return pos + 2;
                 case 21:
                     return pos + 1;
                 default:
                     throw new ArgumentException("Invalid command");
             }
+        }
+
+        public static List<List<int>> Permute(List<int> list)
+        {
+            var result = new List<List<int>>();
+            if (list.Count == 1)
+            {
+                result.Add(new List<int> {list[0]});
+            }
+            else
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var permutations = Permute(list.Take(i).Concat(list.Skip(i + 1)).ToList());
+                    foreach (var perm in permutations)
+                    {
+                        result.Add(new List<int> { list[i] }.Concat(perm).ToList());
+                    }                    
+                }
+            }
+            return result;
         }
     }
 }

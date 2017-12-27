@@ -1,3 +1,7 @@
+Questions:
+- help to look at an element
+- for the can oil: West->North->South which means you don't get to where you were if you turn back?
+
 == Synacor Challenge ==
 In this challenge, your job is to use this architecture spec to create a
 virtual machine capable of running the included binary.  Along the way,
@@ -68,7 +72,7 @@ rmem: 15 a b
 wmem: 16 a b
   write the value from <b> into memory at address <a>
 call: 17 a
-  write the address of the next instruction to the stack and jump to <a>  // next instruction is a or after a?
+  write the address of the next instruction to the stack and jump to <a>
 ret: 18
   remove the top element from the stack and jump to it; empty stack = halt
 out: 19 a
