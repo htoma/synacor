@@ -53,11 +53,19 @@ namespace synacor
             }
         }
 
-        private void Log(string line)
+        private void Log(int pos, string line)
         {
+            if (!_log && pos == 6027)
+            {
+                _log = true;
+            }
+            if (line == "call (17): 6027")
+            {
+                File.AppendAllLines(_logFilename, new[] { $"r0: {_registers[0]}, r1: {_registers[1]}" });
+            }
             if (_log)
             {
-                File.AppendAllLines(_logFilename, new[] {line});
+                //File.AppendAllLines(_logFilename, new[] {$"{pos}: {line}"});
             }
         }
 
@@ -97,15 +105,15 @@ namespace synacor
                 case 0:
                     return _size;
                 case 1:
-                    Log($"{pos} set   (1): {_memory[pos + 1]} {_memory[pos + 2]}");
+                    Log(pos, $"set   (1): {_memory[pos + 1]} {_memory[pos + 2]}");
                     _registers[GetRegister(_memory[pos + 1])] = GetRealValue(_memory[pos + 2]);
                     return pos + 3;
                 case 2:
-                    Log($"{pos} push  (2): {_memory[pos + 1]}");
+                    Log(pos, $"push  (2): {_memory[pos + 1]}");
                     _stack.Push(GetRealValue(_memory[pos + 1]));
                     return pos + 2;
                 case 3:
-                    Log($"{pos} pop   (3): {_memory[pos + 1]}");
+                    Log(pos, $"pop   (3): {_memory[pos + 1]}");
                     if (_stack.Count == 0)
                     {
                         throw new ArgumentException("Empty stack");
@@ -113,88 +121,88 @@ namespace synacor
                     _registers[GetRegister(_memory[pos + 1])] = _stack.Pop();
                     return pos + 2;
                 case 4:
-                    Log($"{pos} eq    (4): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"eq    (4): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) == GetRealValue(_memory[pos + 3]) ? 1 : 0;
                     return pos + 4;
                 case 5:
-                    Log($"{pos} gq    (5): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"gq    (5): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) > GetRealValue(_memory[pos + 3]) ? 1 : 0;
                     return pos + 4;
                 case 6:
-                    Log($"{pos} jmp   (6): {_memory[pos + 1]}");
+                    Log(pos, $"jmp   (6): {_memory[pos + 1]}");
                     return GetRealValue(_memory[pos + 1]);
                 case 7:
-                    Log($"{pos} jt    (7): {_memory[pos + 1]} {_memory[pos + 2]}");
+                    Log(pos, $"jt    (7): {_memory[pos + 1]} {_memory[pos + 2]}");
                     if (GetRealValue(_memory[pos + 1]) != 0)
                     {
                         return GetRealValue(_memory[pos + 2]);
                     }
                     return pos + 3;
                 case 8:
-                    Log($"{pos} jf    (8): {_memory[pos + 1]} {_memory[pos + 2]}");
+                    Log(pos, $"jf    (8): {_memory[pos + 1]} {_memory[pos + 2]}");
                     if (GetRealValue(_memory[pos + 1]) == 0 /*|| _memory[pos + 1] == 32775*/)
                     {
                         return GetRealValue(_memory[pos + 2]);
                     }
                     return pos + 3;
                 case 9:
-                    Log($"{pos} add   (9): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"add   (9): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         (GetRealValue(_memory[pos + 2]) + GetRealValue(_memory[pos + 3])) % 32768;
                     return pos + 4;
                 case 10:
-                    Log($"{pos} mult (10): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"mult (10): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) * GetRealValue(_memory[pos + 3]) % 32768;
                     return pos + 4;
                 case 11:
-                    Log($"{pos} mod  (11): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"mod  (11): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) % GetRealValue(_memory[pos + 3]);
                     return pos + 4;
                 case 12:
-                    Log($"{pos} and  (12): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"and  (12): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) & GetRealValue(_memory[pos + 3]);
                     return pos + 4;
                 case 13:
-                    Log($"{pos} or   (13): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"or   (13): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     _registers[GetRegister(_memory[pos + 1])] =
                         GetRealValue(_memory[pos + 2]) | GetRealValue(_memory[pos + 3]);
                     return pos + 4;
                 case 14:
-                    Log($"{pos} not  (14): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
+                    Log(pos, $"not  (14): {_memory[pos + 1]} {_memory[pos + 2]} {_memory[pos + 3]}");
                     uint tmp = (uint) GetRealValue(_memory[pos + 2]);
                     var value = (~tmp << 17) >> 17;
                     _registers[GetRegister(_memory[pos + 1])] = (int) value;
                     return pos + 3;
                 case 15:
-                    Log($"{pos} rmem (15): {_memory[pos + 1]} {_memory[pos + 2]}");
+                    Log(pos, $"rmem (15): {_memory[pos + 1]} {_memory[pos + 2]}");
                     _registers[GetRegister(_memory[pos + 1])] = _memory[GetRealValue(_memory[pos + 2])];
                     return pos + 3;
                 case 16:
-                    Log($"{pos} wmem (16): {_memory[pos + 1]} {_memory[pos + 2]}");
+                    Log(pos, $"wmem (16): {_memory[pos + 1]} {_memory[pos + 2]}");
                     _memory[GetRealValue(_memory[pos + 1])] = GetRealValue(_memory[pos + 2]);
                     return pos + 3;
                 case 17:
-                    Log($"{pos} call (17): {_memory[pos + 1]}");
+                    Log(pos, $"call (17): {_memory[pos + 1]}");
                     _stack.Push(pos + 2);
                     return GetRealValue(_memory[pos + 1]);
                 case 18:
-                    Log($"{pos} ret  (18):");
+                    Log(pos, $"ret  (18):");
                     if (_stack.Count == 0)
                     {
                         return _size;
                     }
                     return GetRealValue(_stack.Pop());
                 case 19:
-                    Log($"{pos} out  (19): {_memory[pos + 1]}");
+                    Log(pos, $"out  (19): {_memory[pos + 1]}");
                     Console.Write((char)GetRealValue(_memory[pos + 1]));
                     return pos + 2;
                 case 20:
-                    Log($"{pos} in   (20): {_memory[pos + 1]}");
+                    Log(pos, $"in   (20): {_memory[pos + 1]}");
                     if (_moves.Length > 0)
                     {
                         if (_moves[0] == 13)
@@ -209,7 +217,7 @@ namespace synacor
                     {
                         //dummy value for detecting teleporter algorithm
                         _registers[7] = 32767;
-                        _log = true;
+                        //_log = true;
                         var key = Console.ReadKey().KeyChar;
                         _registers[GetRegister(_memory[pos + 1])] = key != 13 ? key : 10;
                     }
