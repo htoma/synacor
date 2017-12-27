@@ -23,7 +23,14 @@ namespace synacor
 
         public List<string> GetCoinCombination()
         {
-            return null;
+            foreach (var perm in Permute(_coins.Keys.ToList()))
+            {
+                if (CoinCombination(perm[0], perm[1], perm[2], perm[3], perm[4]))
+                {
+                    return perm.Select(x => _coins[x]).ToList();
+                }
+            }
+            throw new Exception("Invalid list of coins");
         }
         
         public void Process(string filename, bool useKnownMoves = true)
@@ -177,7 +184,7 @@ namespace synacor
             }
         }
 
-        public static List<List<int>> Permute(List<int> list)
+        private static List<List<int>> Permute(List<int> list)
         {
             var result = new List<List<int>>();
             if (list.Count == 1)
@@ -196,6 +203,11 @@ namespace synacor
                 }
             }
             return result;
+        }
+
+        private static bool CoinCombination(int a, int b, int c, int d, int e)
+        {
+            return a + b * c * c + d * d * d - e == 399;
         }
     }
 }
