@@ -5,7 +5,7 @@
         static void Main(string[] args)
         {
             var architecture = new Architecture();
-            architecture.Process("challenge.bin");
+            architecture.Process("challenge.bin", true, "log.txt");
         }
     }
 }
