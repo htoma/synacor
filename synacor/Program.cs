@@ -6,6 +6,7 @@
         {
             var architecture = new Architecture();
             architecture.Process("challenge.bin", true, "log.txt");
+            //new Grid().SolveGrid();
         }
     }
 }

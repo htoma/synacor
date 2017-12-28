@@ -61,7 +61,7 @@ namespace synacor
             }
             if (line == "call (17): 6027")
             {
-                File.AppendAllLines(_logFilename, new[] { $"r0: {_registers[0]}, r1: {_registers[1]}" });
+                //File.AppendAllLines(_logFilename, new[] { $"r0: {_registers[0]}, r1: {_registers[1]}" });
             }
             if (_log)
             {
@@ -188,6 +188,12 @@ namespace synacor
                     return pos + 3;
                 case 17:
                     Log(pos, $"call (17): {_memory[pos + 1]}");
+                    if (_memory[pos + 1] == 6027)
+                    {
+                        _registers[0] = 6;
+                        _registers[7] = 25734;
+                        return pos + 2;
+                    }
                     _stack.Push(pos + 2);
                     return GetRealValue(_memory[pos + 1]);
                 case 18:
@@ -216,8 +222,8 @@ namespace synacor
                     else
                     {
                         //dummy value for detecting teleporter algorithm
-                        _registers[7] = 32767;
-                        //_log = true;
+                        _registers[7] = 1;
+                        _log = true;
                         var key = Console.ReadKey().KeyChar;
                         _registers[GetRegister(_memory[pos + 1])] = key != 13 ? key : 10;
                     }
